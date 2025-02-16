@@ -62,21 +62,17 @@ class NpShopDataReplacer {
                 $productsHtml = str_replace('u-products ', 'u-products u-cms ', $productsHtml);
 
                 if (strpos($productsHtml, 'data-products-datasource') === false) {
-                    $source = isset($_GET['productsList']) || isset($_GET['products-list']) ? 'site' : 'cms';
+                    $source = isset($_GET['productsList']) ? 'site' : 'cms';
                     $productsHtml = str_replace('data-site-sorting-order', 'data-products-id="1" data-products-datasource="' . $source . '" data-site-sorting-order', $productsHtml);
                 }
 
                 if (strpos($productsHtml, 'data-products-datasource="cms"') !== false) {
-                    $source = isset($_GET['productsList']) || isset($_GET['products-list']) ? 'site' : 'cms';
+                    $source = isset($_GET['productsList']) ? 'site' : 'cms';
                     $productsHtml = str_replace('data-products-datasource="cms"', 'data-products-id="1" data-products-datasource="' . $source . '"', $productsHtml);
                 }
 
                 if (strpos($productsHtml, 'data-products-id="1"') === false) {
                     $productsHtml = str_replace('data-products-datasource', 'data-products-id="1" data-products-datasource', $productsHtml);
-                }
-
-                if (get_option('np_theme_appearance') === 'plugin-option' && function_exists('wc_get_product') && (is_shop() || is_product_category())) {
-                    $productsHtml = str_replace('data-products-datasource="site"', 'data-products-datasource="cms"', $productsHtml);
                 }
 
                 if (preg_match('/data-site-category="([\s\S]*?)"/', $productsHtml, $matches)) {
@@ -179,19 +175,19 @@ class NpShopDataReplacer {
             '/<\!--product-->([\s\S]+?)<\!--\/product-->/',
             function ($productMatch) {
                 $productHtml = $productMatch[1];
-                $prefix = Nicepage::$override_with_plugin && (isset($_GET['products-list']) || isset($_GET['product-id'])) ? 'product-id' : 'productId';
-                if (isset($_GET[$prefix]) || strpos($productHtml, 'data-product-id') !== false) {
+
+                if (isset($_GET['productId']) || strpos($productHtml, 'data-product-id') !== false) {
                     $siteProducts = isset(self::$productsJson['products']) ? self::$productsJson['products'] : array();
                     $products = array_combine(array_column($siteProducts, 'id'), $siteProducts);
                 }
 
                 if (strpos($productHtml, 'data-products-datasource') === false) {
-                    $source = isset($_GET[$prefix]) ? 'site' : 'cms';
+                    $source = isset($_GET['productId']) ? 'site' : 'cms';
                     $productHtml = str_replace('data-product-id', 'data-products-datasource="' . $source . '" data-product-id', $productHtml);
                 }
 
                 if (strpos($productHtml, 'data-products-datasource="cms"') !== false) {
-                    $source = isset($_GET[$prefix]) ? 'site' : 'cms';
+                    $source = isset($_GET['productId']) ? 'site' : 'cms';
                     $productHtml = str_replace('data-products-datasource="cms"', 'data-products-datasource="' . $source . '"', $productHtml);
                 }
 
@@ -200,9 +196,9 @@ class NpShopDataReplacer {
                 }
 
                 if (self::$siteProductsProcess) {
-                    if (isset($_GET[$prefix]) && $_GET[$prefix] || strpos($productHtml, 'data-product-id') !== false) {
-                        if (isset($_GET[$prefix])) {
-                            $productId = $_GET[$prefix];
+                    if (isset($_GET['productId']) && $_GET['productId'] || strpos($productHtml, 'data-product-id') !== false) {
+                        if (isset($_GET['productId'])) {
+                            $productId = $_GET['productId'];
                         } else {
                             if (preg_match('/data-product-id="([\s\S]+?)"/', $productHtml, $matchesId)) {
                                 $productId = $matchesId[1];
@@ -222,10 +218,6 @@ class NpShopDataReplacer {
                         $products = NpAdminActions::getPosts($productsSource, 1, 'product');
                     }
                     $params['source'] = ''; //reset source after get product
-                }
-                if (get_option('np_theme_appearance') === 'plugin-option' && function_exists('wc_get_product') && is_product()) {
-                    global $wp_query;
-                    $products = isset($wp_query->posts) ? $wp_query->posts : array();
                 }
 
                 if (count($products) < 1) {
@@ -291,9 +283,6 @@ class NpShopDataReplacer {
             '/<\!--categories-->([\s\S]+?)<\!--\/categories-->/',
             function ($categoriesMatch) {
                 $categoriesHtml = $categoriesMatch[1];
-                if (get_option('np_theme_appearance') === 'plugin-option' && function_exists('wc_get_product') && (is_shop() || is_product_category())) {
-                    $categoriesHtml = str_replace('data-products-datasource="site"', 'data-products-datasource="cms"', $categoriesHtml);
-                }
                 self::$siteProductsProcess = strpos($categoriesHtml, 'data-products-datasource="site"') !== false ? true : false;
                 $categories = self::$siteProductsProcess ? (isset(self::$productsJson['categories']) ? self::$productsJson['categories'] : array()) : (class_exists('Woocommerce') ? get_terms('product_cat', array('hide_empty' => false)) : array());
                 if ($categories && count($categories) > 0) {
@@ -324,13 +313,12 @@ class NpShopDataReplacer {
                     $list = self::_processCategoriesItem($list, ($lvl + 1));
                     $category = str_replace($matchesUl[0], $list, $category);
                 }
-                $prefix = Nicepage::$override_with_plugin && (isset($_GET['products-list']) || isset($_GET['product-id'])) ? 'products-list' : 'productsList';
-                $link = self::$siteProductsProcess ? home_url('?' . $prefix . '') : (class_exists('Woocommerce') ? get_permalink(wc_get_page_id('shop')) : home_url('?' . $prefix . ''));
+                $link = self::$siteProductsProcess ? home_url('?productsList') : (class_exists('Woocommerce') ? get_permalink(wc_get_page_id('shop')) : home_url('?productsList'));
                 if (preg_match('/data-category=[\'|"]([\s\S]*?)[\'|"]/', $category, $matchesId)) {
                     $categoryId = isset($matchesId[1]) ? $matchesId[1] : 0;
                     if ($categoryId) {
                         if (self::$siteProductsProcess) {
-                            $link = home_url('?' . $prefix . '#/1///' . $categoryId);
+                            $link = home_url('?productsList#/1///' . $categoryId);
                         } else {
                             $categoryObject = get_term($categoryId, 'product_cat');
                             $link = $categoryObject && class_exists('Woocommerce') ? get_term_link($categoryObject, 'product_cat') : '#';
@@ -433,216 +421,7 @@ class NpBlogPostDataReplacer {
     public static function process($content) {
         $content = self::_processBlogControl($content);
         $content = self::_processPostControl($content);
-        $content = self::_processCategoriesControl($content);
         return $content;
-    }
-
-    /**
-     * Replace categories control for blog
-     *
-     * @param string $content
-     *
-     * @return string
-     */
-    private static function _processCategoriesControl($content) {
-        return preg_replace_callback(
-            '/<\!--categories-->([\s\S]+?)<\!--\/categories-->/',
-            function ($categoriesMatch) {
-                $categoriesHtml = $categoriesMatch[1];
-                $categories = get_terms(
-                    array(
-                        'taxonomy' => 'category',
-                        'hide_empty' => false,
-                    )
-                );
-                if ($categories && count($categories) > 0) {
-                    $categoriesHtmlCopy = $categoriesHtml;
-                    $categoriesItem = self::extractCategoryItem($categoriesHtmlCopy);
-                    $categoriesHtml = preg_replace('/<ul[^>]*>[\s\S]*<\/ul>/', '<ul class="u-unstyled">{categories}</ul>', $categoriesHtml, 1);
-                    $type = strpos($categoriesHtml, 'u-categories-horizontal') !== false ? 'horizontal' : 'vertical';
-                    $cmsTemplate = strpos($categoriesHtml, 'categories-type="blog"') !== false ? 'blog' : 'products';
-                    $args = array(
-                        'template' => $categoriesHtml,
-                        'itemTemplate' => $categoriesItem,
-                        'type' => $type,
-                        'cmsTemplate' => $cmsTemplate,
-                    );
-                    $categoriesHtml = self::getCategoriesHtml($args);
-                }
-                return $categoriesHtml;
-            },
-            $content
-        );
-    }
-
-    /**
-     * Get categories html
-     *
-     * @param array $args
-     *
-     * @return string $categories_html
-     */
-    public static function getCategoriesHtml($args) {
-        $categories_html = '';
-        $category = get_queried_object();
-        $category_id = isset($category->term_id) ? $category->term_id : 0;
-        $showIcon = 'fill-opacity="1"';
-        $hideIcon = 'fill-opacity="0"';
-        $linkTitle = '{content}';
-        $linkUrl = '{url}';
-        $isActiveLi = '{activeLi}';
-        $isActiveLink = '{activeLink}';
-        $iconOpen = '#icon-categories-open';
-        $iconClosed = '#icon-categories-closed';
-        $liOpen = 'u-expand-open';
-        $liClosed = 'u-expand-closed';
-        $categoryCheck = is_category();
-        if ($category_id) {
-            if ($categoryCheck) {
-                // add back link
-                if ($category->parent) {
-                    // parent cat url
-                    $blogHref = esc_url(get_category_link($category->parent));
-                } else {
-                    $blogHref = get_option('show_on_front') === 'posts' ? get_home_url() : home_url('/?post_type=post');
-                }
-                $backIcon = $args['type'] === 'horizontal' ? '&#10094; &nbsp;' : '';
-                $categories_html .= str_replace(
-                    array($linkTitle, $linkUrl, $isActiveLi, $isActiveLink, $showIcon),
-                    array($backIcon . __('Back', 'nicepage'), $blogHref, '', '', $hideIcon),
-                    $args['itemTemplate']
-                );
-            }
-            $subCats_html = self::getSubCatHtml($category_id, $args);
-            // add current cat link
-            $needShowIcon = self::isCategoryHasChild($category);
-            $catName = esc_attr($category->name);
-            $catLink = esc_url(get_term_link($category));
-            $categories_html .= str_replace(
-                array($linkTitle, $linkUrl, $isActiveLi, $isActiveLink, $iconOpen, $liOpen, $showIcon, '</li>'),
-                array($catName, $catLink, 'u-active', 'active', $iconClosed, $liClosed, $needShowIcon,  $subCats_html . '</li>'),
-                $args['itemTemplate']
-            );
-            if ($args['type'] === 'horizontal') {
-                $categories_html .= self::getSubCatHtml($category_id, $args, true);
-            }
-        } else {
-            $template_cats = self::npGetCategories($category_id, $args['cmsTemplate']);
-            if ($template_cats) {
-                foreach ($template_cats as $template_category) {
-                    $needShowIcon = self::isCategoryHasChild($template_category);
-                    $catName = esc_attr($template_category->name);
-                    $catLink = esc_url(get_term_link($template_category));
-                    if ($needShowIcon === $showIcon) {
-                        $subCats_html = self::getSubCatHtml($template_category->term_id, $args);
-                    } else {
-                        $subCats_html = '';
-                    }
-                    $categories_html .= str_replace(
-                        array($linkTitle, $linkUrl, $isActiveLi, $isActiveLink, $showIcon, $iconOpen, $liOpen, 'u-expand-leaf', '</li>'),
-                        array($catName, $catLink, '', '', $needShowIcon, $iconClosed, $liClosed, 'u-expand-closed', $subCats_html . '</li>'),
-                        $args['itemTemplate']
-                    );
-                }
-            }
-        }
-        $categories_html = strtr($args['template'], array('{categories}' => $categories_html));
-        return $categories_html;
-    }
-
-    /**
-     * Extract categories item from categories html
-     *
-     * @param string $categoriesHtml
-     *
-     * @return string
-     */
-    public static function extractCategoryItem($categoriesHtml) {
-        if (preg_match('/<!--categories_item0-->([\s\S]*?)<!--\/categories_item0-->/s', $categoriesHtml, $matches)) {
-            $item = isset($matches[1]) ? $matches[1] : '';
-            if ($item) {
-                $item = preg_replace('/<ul[^>]*>[\s\S]*<\/ul>/s', '', $item);
-                $item = preg_replace('/(<div[^>]*class=["\'][^"\']*)["\']/', '$1 {activeLi}"', $item);
-                $item = preg_replace('/(<a[^>]*class=["\'][^"\']*)["\']/', '$1 {activeLink}"', $item);
-                $item = preg_replace('/(?<!xlink:)\bhref=["\'][^"\']*["\']/', 'href="{url}"', $item);
-                $item = preg_replace_callback(
-                    '/(<a[^>]*>)(.*?)(<\/a>)/s', function ($matches) {
-                        $before = str_replace('<a', '<a style="outline:none;"', $matches[1]);
-                        $content = $matches[2];
-                        $after = $matches[3];
-                        if (preg_match('/(<svg.*?<\/svg>)(.*)/s', $content, $contentMatches)) {
-                            return $before . '<span class="u-icon" style="padding-right: 5px">' . $contentMatches[1] . '</span>' . '{content}' . $after;
-                        }
-                        return $before . '{content}' . $after;
-                    },
-                    $item
-                );
-            }
-            return $item;
-        }
-        return '';
-    }
-
-    /**
-     * Get sub category html
-     *
-     * @param int   $catId
-     * @param array $args
-     * @param bool  $onlyItems
-     *
-     * @return string
-     */
-    public static function getSubCatHtml($catId, $args, $onlyItems=false) {
-        $subCats_html = '';
-        $sub_cats = self::npGetCategories($catId, $args['cmsTemplate']);
-        if (count($sub_cats) > 0) {
-            foreach ($sub_cats as $sub_category) {
-                $subCats_html .= str_replace(
-                    array('{content}', '{url}', '{activeLi}', '{activeLink}', 'fill-opacity="1"', 'u-root'),
-                    array(esc_attr($sub_category->name), esc_url(get_term_link($sub_category)), '', '', 'fill-opacity="0"', ''),
-                    $args['itemTemplate']
-                );
-            }
-            if (!$onlyItems) {
-                $subCats_html = '<ul class="u-unstyled">' . $subCats_html . '</ul>';
-            }
-        }
-        return $subCats_html;
-    }
-
-    /**
-     * Check has category child and return style
-     *
-     * @param object $category
-     *
-     * @return string
-     */
-    public static function isCategoryHasChild($category) {
-        $term_childs = get_term_children($category->term_id, $category->taxonomy);
-        return count($term_childs) > 0 ? 'fill-opacity="1"' : 'fill-opacity="0"';
-    }
-
-    /**
-     * Get posts categories
-     *
-     * @param int    $category_id
-     * @param string $cmsTemplate
-     *
-     * @return object
-     */
-    public static function npGetCategories($category_id, $cmsTemplate='blog') {
-        $sub_args = array(
-            'orderby'      => 'id',
-            'taxonomy'     => $cmsTemplate === 'blog' ? 'category' : 'product_cat',
-            'parent'       => $category_id,
-            'child_of'     => 0,
-            'show_count'   => 0,
-            'pad_counts'   => 0,
-            'hierarchical' => 0,
-            'title_li'     => '',
-            'hide_empty'   => 1
-        );
-        return get_categories($sub_args);
     }
 
     /**
@@ -662,6 +441,7 @@ class NpBlogPostDataReplacer {
                     'orderby' => 'date',
                 );
                 $blogHtml = $blogMatch[1];
+                $blogHtml = str_replace('u-blog ', 'u-blog u-cms ', $blogHtml);
                 $blogOptions = array();
                 if (preg_match('/<\!--blog_options_json--><\!--([\s\S]+?)--><\!--\/blog_options_json-->/', $blogHtml, $matches)) {
                     $blogOptions = json_decode($matches[1], true);
@@ -676,9 +456,9 @@ class NpBlogPostDataReplacer {
                         $params['source'] = false;
                     }
                 }
-                $site_category_id = isset($_GET['postsCategoryId']) ? $_GET['postsCategoryId'] : 0;
+                $site_category_id = isset($_GET['categoryId']) ? $_GET['categoryId'] : 0;
                 if ($site_category_id) {
-                    $params['id'] = $site_category_id;
+                    $params['source'] = $site_category_id;
                 }
                 $params['count'] = isset($blogOptions['count']) ? $blogOptions['count'] : '';
                 global $blog_control_query;
@@ -786,7 +566,6 @@ class NpBlogPostDataReplacer {
         }
         $content = preg_replace('/<!--blog_post-->([\s\S]+)<!--\/blog_post-->/', $allPostsHtml, $content);
         $content = NpAdminActions::processPagination($content);
-        $content = NpAdminActions::processCategoriesFilter($content, array(), 'blog');
         if (strpos($content, '[[$]]') !== false) {
             $content = str_replace('[[$]]', '$', $content);
         }

@@ -10,7 +10,7 @@
         </div>
     </div>
 WIDGET_TEMPLATE
-        )); ?> <aside data-id="0ddf" class="u-indent-40 u-sidebar" style="flex-basis: auto; width: 250px;"><?php if ($sidebar_html) { echo stylingDefaultControls($sidebar_html); } else { ?> <div class="u-block u-indent-30">
+        )); ?> <aside data-id="8d70" class="u-indent-40 u-sidebar" style="flex-basis: auto; width: 250px;"><?php if ($sidebar_html) { echo stylingDefaultControls($sidebar_html); } else { ?> <div class="u-block u-indent-30">
         <div class="u-block-container u-clearfix">
             <h5 class="u-block-header u-text" style="font-size: 1.125rem; line-height: 2;"><!--block_header_content_replacer-->
                 Block header

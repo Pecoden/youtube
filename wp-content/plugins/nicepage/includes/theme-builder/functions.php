@@ -12,8 +12,7 @@ add_action('template_redirect', 'templates_replacer');
 function templates_replacer($location_manager)
 {
     $headerFooterFromPlugin = get_option('np_theme_appearance') === 'plugin-option';
-    Nicepage::$isWooShopProductTemplate = function_exists('wc_get_product') && (is_shop() || is_product_category() || is_product());
-    Nicepage::$isBlogPostTemplate = is_singular('post') || is_home() || (is_archive() && !Nicepage::$isWooShopProductTemplate);
+    Nicepage::$isBlogPostTemplate = is_singular('post') || is_home() || is_archive();
     if ($headerFooterFromPlugin && Nicepage::isNpTheme()) {
         remove_action('wp_body_open', 'wp_admin_bar_render', 0); // wp-version >= 5.2
         add_action('get_header', 'get_np_header');
@@ -108,35 +107,17 @@ add_filter(
         if (get_option('np_theme_appearance') !== 'plugin-option') {
             return $template;
         }
-        $isShop = function_exists('wc_get_product') && (is_shop() || is_product_category());
-        $isProduct = function_exists('wc_get_product') && is_product();
-        if (get_query_var('products-list', null) !== null) {
-            $render = render_plugin_template('products');
-            return $render ? null : $template;
-        }
-        if (get_query_var('product-id', null) !== null) {
-            $render = render_plugin_template('product');
-            return $render ? null : $template;
-        }
         if (is_singular('post')) {
             $render = render_plugin_template('post');
             return $render ? null : $template;
         }
-        if (is_home() || (is_archive() && !$isShop)) {
+        if (is_home() || is_archive()) {
             $render = render_plugin_template('blog');
             return $render ? null : $template;
         }
-        if ($isShop) {
-            $render = render_plugin_template('products');
-            return $render ? exit : $template;
-        }
-        if ($isProduct) {
-            $render = render_plugin_template('product');
-            return $render ? exit : $template;
-        }
+
         return $template;
-    },
-    51
+    }
 );
 
 /**
@@ -155,7 +136,6 @@ function render_plugin_template($type) {
     );
 
     if (!empty($plugin_templates)) {
-        $GLOBALS['pluginTemplatesExists'] = true;
         $plugin_template = $plugin_templates[0];
         if ($plugin_template && $plugin_template->ID) {
 
@@ -163,19 +143,13 @@ function render_plugin_template($type) {
                 update_option('blog_template_id', $plugin_template->ID);
             }
 
-            if ($type === 'post' || $type === 'blog' || $type === 'products' || $type === 'product') {
+            if ($type === 'post') {
                 global $post;
                 $original_post = $post;
                 $post = get_post($plugin_template->ID);
             }
 
-            if ($type === 'products') {
-                update_option('products_template_id', $plugin_template->ID);
-            }
-
-            if ($type === 'product') {
-                update_option('product_template_id', $plugin_template->ID);
-            }
+            wp_enqueue_style('theme-default-styles', APP_PLUGIN_URL . 'includes/theme-builder/css/style.css');
 
             $sections_html = Nicepage::html($plugin_template->ID);
             if ($sections_html) {
@@ -186,11 +160,7 @@ function render_plugin_template($type) {
                     $sections_html = w123cf_widget_text_filter($sections_html);
                 }
             }
-            ob_start();
             get_header();
-            if ($type === 'product' || $type === 'products') {
-                $sections_html = processWoocommercePlaceholders($sections_html);
-            }
             echo $sections_html;
 
             if ($type === 'post') {
@@ -206,24 +176,7 @@ function render_plugin_template($type) {
             get_footer();
             wpFooterActions($plugin_template->ID);
 
-            // for dialogs start
-            $data_provider = np_data_provider($plugin_template->ID);
-            $headerNp = $data_provider->getNpHeader();
-            $footerNp = $data_provider->getNpFooter();
-            $headerItem = '';
-            $footerItem = '';
-            if ($headerNp && !$data_provider->getHideHeader()) {
-                $headerItem = json_decode($headerNp, true);
-            }
-            if ($footerNp && !$data_provider->getHideFooter()) {
-                $footerItem = json_decode($footerNp, true);
-            }
-            $htmlDocument = ob_get_clean();
-            $htmlDocument = $data_provider->addPublishDialogToBody($htmlDocument, $headerItem, $footerItem);
-            echo $htmlDocument;
-            // for dialogs end
-
-            if ($type === 'post' || $type === 'blog' || $type === 'products' || $type === 'product') {
+            if ($type === 'post') {
                 $post = $original_post;
             }
         }
@@ -372,52 +325,3 @@ function disable_title_input() {
 }
 add_action('admin_head-post.php', 'disable_title_input');
 add_action('admin_head-post-new.php', 'disable_title_input');
-
-/**
- * Hooks replacer in plugin woo templates
- *
- * @param string $html Plugin Template HTML with placeholders.
- *
- * @return string HTML with result of hooks.
- */
-function processWoocommercePlaceholders($html) {
-    // Hooks list.
-    $hooks = [
-        'woocommerce_before_single_product',         // before product details
-        'woocommerce_single_product_summary',        // after last control - product button
-        'woocommerce_after_single_product',          // after product details
-        'woocommerce_before_add_to_cart_button',     // before add to cart button
-        'woocommerce_after_add_to_cart_button',      // after add to cart button
-        'woocommerce_after_main_content',            // before woocommerce_sidebar
-        'woocommerce_sidebar',                       // before footer
-    ];
-
-    if (function_exists('is_woocommerce') && is_woocommerce()) {
-        //disable not needed hooks
-        remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_title', 5);
-        remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_price', 10);
-        remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20);
-        remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30);
-        remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_meta', 40);
-    }
-
-    foreach ($hooks as $hook) {
-        $replacerTo = function_exists('is_woocommerce') && is_woocommerce() ? getHookOutput($hook) : '';
-        $html = str_replace('<!-- {{' . $hook . '}} -->', $replacerTo, $html);
-    }
-    $html = preg_replace('/<!--\s*\{\{add_to_cart_button_classes:.*?\}\}\s*-->/', '', $html);
-    return $html;
-}
-
-/**
- * Get result of hook
- *
- * @param string $hook Hook Name.
- *
- * @return string Hook result.
- */
-function getHookOutput( $hook ) {
-    ob_start();
-    do_action($hook);
-    return ob_get_clean();
-}

@@ -945,9 +945,6 @@ class NpAdminActions {
         } else {
             $params['source'] = html_entity_decode($params['source'], ENT_QUOTES, 'UTF-8');
             $cat_id = NpAdminActions::getCatIdByType($params['source'], $params['entity_type']);
-            if (isset($params['id']) && $params['id']) {
-                $cat_id = $params['id'];
-            }
             if ($params['source'] && $params['source'] !== 'featured' && $cat_id < 1) {
                 return $control_query;
             }
@@ -1061,134 +1058,6 @@ class NpAdminActions {
         return $content;
     }
 
-    private static $_siteProductsProcess = false;
-    private static $_blogProcess = false;
-
-    /**
-     * Process categories filter for products controls
-     *
-     * @param string $content
-     * @param array  $options
-     * @param string $type
-     *
-     * @return string $content
-     */
-    public static function processCategoriesFilter($content, $options, $type) {
-        self::$_siteProductsProcess = $type === 'np_products';
-        self::$_blogProcess = $type === 'blog';
-        if (self::$_siteProductsProcess) {
-            $type = 'products';
-        }
-        $content = preg_replace_callback(
-            '/<\!--' . $type . '_categories_filter_select-->([\s\S]+?)<\!--\/' . $type . '_categories_filter_select-->/',
-            function ($selectMatch) use ($options) {
-                $selectHtml = $selectMatch[1];
-                preg_match('/<option[\s\S]*?>[\s\S]+?<\/option>/', $selectHtml, $selectOptions);
-                $firstOptionHtml = $selectOptions[0];
-                $selectHtml = preg_replace('/<option[\s\S]*?>[\s\S]*<\/option>/', '{categoriesFilterOptions}', $selectHtml);
-                if (self::$_blogProcess) {
-                    $categories = get_terms(
-                        array(
-                            'taxonomy' => 'category',
-                            'hide_empty' => false,
-                        )
-                    );
-                } else {
-                    if (self::$_siteProductsProcess) {
-                        $categories = isset($options['productsJson']['categories']) ? $options['productsJson']['categories'] : array();
-                    } else {
-                        $categories = class_exists('Woocommerce') ? get_terms('product_cat', array('hide_empty' => false)) : array();
-                    }
-                }
-                $selectOptionsHtml = '';
-                // add item all
-                $attrName = self::$_blogProcess ? 'postsCategoryId' : 'categoryId';
-                $activeFilter = isset($_GET[$attrName]) ? $_GET[$attrName] : false;
-                if (get_option('np_theme_appearance') === 'plugin-option' && function_exists('wc_get_product') && (is_shop() || is_product_category())) {
-                    if (!self::$_blogProcess && isset($_GET['featured']) && $_GET['featured']) {
-                        $activeFilter = add_query_arg('featured', 'true', get_permalink(wc_get_page_id('shop')));
-                    }
-                }
-                if (self::$_blogProcess) {
-                    $OptionAllProducts = preg_replace('/value=[\'"][\s\S]*?[\'"]/', 'value=""', $firstOptionHtml);
-                } else {
-                    if (function_exists('wc_get_product') && (is_shop() || is_product_category())) {
-                        $OptionAllProducts = preg_replace('/value=[\'"][\s\S]*?[\'"]/', 'value="' . get_permalink(wc_get_page_id('shop')) . '"', $firstOptionHtml);
-                    } else {
-                        $OptionAllProducts = preg_replace('/value=[\'"][\s\S]*?[\'"]/', 'value=""', $firstOptionHtml);
-                    }
-                }
-
-                $OptionAllProducts = preg_replace('/(<option[\s\S]*?>)[\s\S]+?<\/option>/', '$1' . __('All', 'nicepage') . '</option>', $OptionAllProducts);
-                $selectOptionsHtml .= $OptionAllProducts;
-                if (!self::$_blogProcess) {
-                    // add item featured
-                    if (get_option('np_theme_appearance') === 'plugin-option' && function_exists('wc_get_product') && (is_shop() || is_product_category())) {
-                        $featuredLink = class_exists('Woocommerce') ? add_query_arg('featured', 'true', get_permalink(wc_get_page_id('shop'))) : '';
-                    } else {
-                        $featuredLink = 'featured';
-                    }
-
-                    $OptionFeaturedProducts = preg_replace('/value=[\'"][\s\S]*?[\'"]/', 'value="' . $featuredLink . '"', $firstOptionHtml);
-                    $OptionFeaturedProducts = preg_replace('/(<option[\s\S]*?>)[\s\S]+?<\/option>/', '$1' . __('Featured', 'nicepage') . '</option>', $OptionFeaturedProducts);
-                    if (!self::$_siteProductsProcess && $activeFilter && $featuredLink === $activeFilter) {
-                        $OptionFeaturedProducts = str_replace('<option', '<option selected="selected"', $OptionFeaturedProducts);
-                    }
-                    $selectOptionsHtml .= $OptionFeaturedProducts;
-                }
-
-                // add all categories with hierarchy
-                $selectOptionsHtml .= self::_generate_category_options($categories, $firstOptionHtml);
-                $selectHtml = str_replace('{categoriesFilterOptions}', $selectOptionsHtml, $selectHtml);
-                return $selectHtml;
-            },
-            $content
-        );
-        return $content;
-    }
-
-    /**
-     * Generate categories filter options with hierarchy
-     *
-     * @param array  $categories
-     * @param string $itemTemplate
-     * @param int    $parent
-     * @param string $prefix
-     *
-     * @return string $result
-     */
-    private static function _generate_category_options( $categories, $itemTemplate, $parent = 0, $prefix = '' ) {
-        $result = '';
-        $attrName = self::$_blogProcess ? 'postsCategoryId' : 'categoryId';
-        $activeFilter = isset($_GET[$attrName]) ? $_GET[$attrName] : false;
-        if (get_option('np_theme_appearance') === 'plugin-option' && function_exists('wc_get_product') && (is_shop() || is_product_category())) {
-            $term = get_queried_object();
-            if ($term && is_a($term, 'WP_Term') && isset($term->term_id)) {
-                $activeFilter = $term->term_id;
-            }
-        }
-        foreach ($categories as $category) {
-            $parentId = self::$_siteProductsProcess ? $category['categoryId'] : $category->parent;
-            $catId = self::$_siteProductsProcess ? $category['id'] : $category->term_id;
-            $catName = self::$_siteProductsProcess ? $category['title'] : $category->name;
-            if ($parentId == $parent) {
-                $doubleOptionHtml = $itemTemplate;
-                if (get_option('np_theme_appearance') === 'plugin-option' && function_exists('wc_get_product') && (is_shop() || is_product_category())) {
-                    $doubleOptionHtml = preg_replace('/value=[\'"][\s\S]*?[\'"]/', 'value="' . get_term_link($category->term_id, 'product_cat') . '"', $doubleOptionHtml);
-                } else {
-                    $doubleOptionHtml = preg_replace('/value=[\'"][\s\S]*?[\'"]/', 'value="' . $catId . '"', $doubleOptionHtml);
-                }
-                $doubleOptionHtml = preg_replace('/(<option[\s\S]*?>)[\s\S]+?<\/option>/', '$1' . $prefix . $catName . '</option>', $doubleOptionHtml);
-                if (!self::$_siteProductsProcess && $activeFilter && (int)$catId === (int)$activeFilter) {
-                    $doubleOptionHtml = str_replace('<option', '<option selected="selected"', $doubleOptionHtml);
-                }
-                $result .= $doubleOptionHtml;
-                $result .= self::_generate_category_options($categories, $itemTemplate, $catId, $prefix . '-');
-            }
-        }
-        return $result;
-    }
-
     /**
      * Try to fix broken json
      *
@@ -1223,10 +1092,6 @@ class NpAdminActions {
         } else {
             global $products_control_query;
             $control_query = $products_control_query;
-            if (get_option('np_theme_appearance') === 'plugin-option' && function_exists('wc_get_product') && (is_shop() || is_product_category())) {
-                global $wp_query;
-                $control_query = $wp_query;
-            }
         }
 
         if (isset($control_query->max_num_pages) && $control_query->max_num_pages < 1) {

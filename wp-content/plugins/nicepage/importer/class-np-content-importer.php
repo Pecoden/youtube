@@ -182,7 +182,6 @@ class NpContentImporter {
     private function _updatePostType($post_type, &$data) {
         $post_time = time() - count($data);
         $menu_order = 0;
-        $post_category_old_new_ids = get_option('post_category_old_new_ids') ?: array();
         foreach ($data as $id => $post_data) {
             if ($post_type === 'post') {
                 $post_id = isset($this->_newPostIds[$post_type][$post_data['id']]) ? $this->_newPostIds[$post_type][$post_data['id']] : 0;
@@ -435,15 +434,6 @@ class NpContentImporter {
                 update_option('page_for_posts', $post_id);
             }
 
-            $post_category_ids = isset($post_data['categories']) && $post_data['categories'] ? $post_data['categories'] : null;
-            if ($post_category_ids && is_string($post_category_ids)) {
-                $post_category_ids = explode(',', $post_category_ids);
-                foreach ($post_category_ids as $key => $cat_id) {
-                    $post_category_ids[$key] = isset($post_category_old_new_ids[$cat_id]) ? $post_category_old_new_ids[$cat_id] : '';
-                }
-                wp_set_post_categories($post_id, $post_category_ids);
-            }
-
             wp_update_post($update_data);
 
             $parameters = isset($this->_data['Parameters']) ? $this->_data['Parameters'] : null;
@@ -595,7 +585,7 @@ class NpContentImporter {
         if ($onlyHeaderFooter) {
             $content = $this->_resetLinks($content);
         }
-        $blogUrl = get_option('show_on_front') === 'posts' ? get_home_url() : home_url('/?post_type=post');
+        $blogUrl = get_option('page_for_posts') ? get_permalink(get_option('page_for_posts')) : get_home_url();
         $content = preg_replace('/\[blog_(\d+)\]/', $blogUrl, $content);
         return str_replace($this->_replaceFrom, $this->_replaceTo, $content);
     }
@@ -866,7 +856,7 @@ class NpContentImporter {
     private function _parseHref($matches)
     {
         if (strpos($matches[0], '[blog') === 0) {
-            $blogUrl = get_option('show_on_front') === 'posts' ? get_home_url() : home_url('/?post_type=post');
+            $blogUrl = get_option('page_for_posts') ? get_permalink(get_option('page_for_posts')) : get_home_url();
             return $blogUrl;
         }
         if (isset($this->_data['Pages'][ $matches[1]])) {
@@ -1018,11 +1008,6 @@ class NpContentImporter {
      * @param string $tax
      */
     private function _importTaxonomies($data_key, $tax) {
-        // import categories for posts
-        if (isset($this->_data['BlogCategories']) && $this->_data['BlogCategories']) {
-            $this->_addedTerms = import_categories_in_posts($this->_data['BlogCategories'], $this->_addedTerms);
-        }
-
         if (!isset($this->_data[$data_key])) {
             return;
         }

@@ -194,8 +194,7 @@ class SiteDataProduct
                 return preg_replace_callback(
                     '/href=[\"\']{1}product-?(\d+)[\"\']{1}/',
                     function ($hrefMatch) {
-                        $prefix = Nicepage::$override_with_plugin && (isset($_GET['products-list']) || isset($_GET['product-id'])) ? 'product-id' : 'productId';
-                        return 'href="' . home_url('?'. $prefix . '=' . $hrefMatch[1]) . '"';
+                        return 'href="' . home_url('?productId=' . $hrefMatch[1]) . '"';
                     },
                     $button_html
                 );

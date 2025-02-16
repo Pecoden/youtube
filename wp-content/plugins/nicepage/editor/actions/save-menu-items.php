@@ -396,10 +396,6 @@ class NpSaveMenuItemsAction extends NpAction {
                 $menu_item_data['menu-item-parent-id'] = $menu_item['parent'];
                 $menu_item_href = $menu_item['href'];
                 $menu_item_object_id = url_to_postid($menu_item_href);
-                $isBlog = stripos($menu_item_href, '?post_type=post') !== false;
-                if ($isBlog) {
-                    $menu_item_object_id = 0;
-                }
                 if ($menu_item_object_id && $menu_item_object_id > 0) {
                     $postObject = get_post($menu_item_object_id);
                     if ($postObject) {
@@ -470,8 +466,7 @@ class NpSaveMenuItemsAction extends NpAction {
                     $menu_item_object_id = url_to_postid($menu_item_href);
                     if ($menu_item_object_id && $menu_item_object_id > 0) {
                         $isAnchor = stripos($menu_item_href, '#') !== false;
-                        $isBlog = stripos($menu_item_href, '?post_type=post') !== false;
-                        if ($isAnchor || $isBlog) {
+                        if ($isAnchor) {
                             $menu_item_data['menu-item-type'] = 'custom';
                             $menu_item_data['menu-item-url'] = $menu_item_href;
                         } else {

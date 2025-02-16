@@ -12,7 +12,7 @@
   background-image: none;
 }
 .u-header .u-sheet-1 {
-  min-height: 80px;
+  min-height: 79px;
 }
 .u-header .u-image-1 {
   width: 64px;
@@ -24,7 +24,7 @@
   height: 100%;
 }
 .u-header .u-menu-1 {
-  margin: -32px 0 22px auto;
+  margin: -32px 0 0 auto;
 }
 .u-header .u-nav-1 {
   font-size: 1rem;
@@ -33,8 +33,16 @@
 .u-header .u-nav-2 {
   font-size: 1.25rem;
 }
+.u-header .u-shopping-cart-1 {
+  height: 24px;
+  width: 24px;
+  margin: -30px auto 28px 94px;
+}
 @media (max-width: 1199px) {
   .u-header .u-menu-1 {
     width: auto;
+  }
+  .u-header .u-shopping-cart-1 {
+    margin-left: 94px;
   }
 }</style>

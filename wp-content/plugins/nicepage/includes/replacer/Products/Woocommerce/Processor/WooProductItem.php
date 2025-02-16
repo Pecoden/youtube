@@ -28,10 +28,6 @@ class WooProductItem extends ProductItem {
         if ($allTemplates > 0) {
             $allProductsHtml = '';
             global $products_control_query;
-            if (get_option('np_theme_appearance') === 'plugin-option' && function_exists('wc_get_product') && (is_shop() || is_product_category())) {
-                global $wp_query;
-                $products_control_query = $wp_query;
-            }
             if (($products_control_query && method_exists($products_control_query, 'have_posts')) || $products) {
                 if (count($products) < 1) {
                     return ''; // remove cell, if products is missing
@@ -57,8 +53,8 @@ class WooProductItem extends ProductItem {
         }
         $content = preg_replace('/<!--product_item-->([\s\S]+)<!--\/product_item-->/', $allProductsHtml, $content);
         $content = NpAdminActions::processPagination($content, 'products', $this->_options['siteProductsProcess']);
-        $content = NpAdminActions::processCategoriesFilter($content, $this->_options, 'products');
         $content = $this->processSorting($content);
+        $content = $this->processCategoriesFilter($content);
         $content = $this->_buildGridAutoRows($products, $this->_options, $content);
         return $content;
     }
@@ -75,13 +71,6 @@ class WooProductItem extends ProductItem {
             '/<\!--products_sorting-->([\s\S]+?)<\!--\/products_sorting-->/',
             function ($sortingMatch) {
                 $sortingHtml = $sortingMatch[1];
-                if (get_option('np_theme_appearance') === 'plugin-option' && function_exists('wc_get_product') && (is_shop() || is_product_category())) {
-                    $sortingHtml = str_replace('u-select-sorting', 'u-select-sorting orderby', $sortingHtml);
-                    $sortingHtml = str_replace('u-sorting"', 'u-sorting woocommerce-ordering"', $sortingHtml);
-                    $sortingHtml = str_replace('<select', '<form method="get"><select', $sortingHtml);
-                    $sortingHtml = str_replace('</select>', '</select><input type="hidden" name="paged" value="1"><input type="hidden" name="post_type" value="product"></form>', $sortingHtml);
-                    $sortingHtml = str_replace('name="sorting"', 'name="orderby"', $sortingHtml);
-                }
                 preg_match('/<option[\s\S]*?>[\s\S]+?<\/option>/', $sortingHtml, $sortingOptions);
                 $firstOptionHtml = $sortingOptions[0];
                 $sortingHtml = preg_replace('/<option[\s\S]*?>[\s\S]*<\/option>/', '{sortingOptions}', $sortingHtml);
@@ -95,9 +84,6 @@ class WooProductItem extends ProductItem {
                 );
                 $sortingOptionsHtml = '';
                 $activeSorting = isset($_GET['sorting']) ? $_GET['sorting'] : false;
-                if (get_option('np_theme_appearance') === 'plugin-option' && function_exists('wc_get_product') && (is_shop() || is_product_category())) {
-                    $activeSorting = isset($_GET['orderby']) ? $_GET['orderby'] : false;
-                }
                 foreach ($sorting_options as $name => $sorting_option) {
                     $doubleOptionHtml = $firstOptionHtml;
                     $doubleOptionHtml = preg_replace('/value=[\'"][\s\S]*?[\'"]/', 'value="' . $name . '"', $doubleOptionHtml);
@@ -127,7 +113,6 @@ class WooProductItem extends ProductItem {
         if (!$product) {
             return $content;
         }
-        $content = $this->_replaceHooks($content);
         $content = $this->_replaceTitle($content);
         $content = $this->_replaceFullDesc($content);
         $content = $this->_replaceShortDesc($content);
@@ -146,18 +131,6 @@ class WooProductItem extends ProductItem {
             $content = $this->_addProductSchema($content);
         }
         return $content;
-    }
-
-    /**
-     * Replace placeholder for woo hooks
-     *
-     * @param string $content
-     *
-     * @return string $content
-     */
-    protected function _replaceHooks($content) {
-        $content = str_replace('<!-- {{woocommerce_before_shop_loop_item}} -->', getHookOutput('woocommerce_before_shop_loop_item'), $content);
-        return str_replace('<!-- {{woocommerce_after_shop_loop_item}} -->', getHookOutput('woocommerce_after_shop_loop_item'), $content);
     }
 
     /**
@@ -350,10 +323,6 @@ class WooProductItem extends ProductItem {
                         if (preg_match('/<[^>]*class="[^"]*u-icon[^"]*"[^>]*>/s', $content, $matchesIcon)) {
                             $controlOptions['content'] = $content;
                         }
-                        if (get_option('np_theme_appearance') === 'plugin-option' && (is_shop() || is_product_category())) {
-                            $controlOptions['content'] = '';
-                            $button_html = str_replace('u-add-to-cart-link', '', $button_html);
-                        }
                         $button_html = str_replace($matchesContent[0], '%s', $button_html);
                     }
                 }
@@ -373,9 +342,6 @@ class WooProductItem extends ProductItem {
                         $button_html = str_replace('href', 'data-quantity="1" data-product_id="%s" data-product_sku="%s" href', $button_html);
                     }
                     $button_html = NpDataProduct::getProductButtonHtml($button_html, $product, $this->_options['typeControl'], $controlOptions);
-                    if ($this->_options['typeControl'] === "products") {
-                        return Nicepage::$override_with_plugin ? '' : $button_html;
-                    }
                     if ($this->_options['typeControl'] === "product" && $this->productData['type'] !== "variable") {
                         ob_start();
                         woocommerce_template_single_add_to_cart();

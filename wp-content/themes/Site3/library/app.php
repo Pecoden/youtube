@@ -10,11 +10,12 @@ function theme_app_settings($settings) {
     return json_decode(<<<JSON
     {
     "colorScheme": {
+        "name": "summer-time",
+        "isDefault": true,
         "bodyColors": [
             "#111111",
             "#ffffff"
         ],
-        "bgColor": "#ffffff",
         "colors": [
             "#478ac9",
             "#db545a",
@@ -22,18 +23,10 @@ function theme_app_settings($settings) {
             "#2cccc4",
             "#b9c1cc"
         ],
-        "customColors": [
-            {
-                "color": "#ffb300",
-                "status": 0,
-                "transparency": 1,
-                "index": 0
-            }
-        ],
+        "bgColor": "#ffffff",
         "shadingContrast": "body-alt-color",
         "whiteContrast": "body-color",
-        "bgContrast": "body-color",
-        "name": "u10"
+        "bgContrast": "body-color"
     },
     "fontScheme": {
         "name": "Roboto-OpenSans",
@@ -48,8 +41,7 @@ function theme_app_settings($settings) {
         }
     },
     "typography": {
-        "name": "Normal-1",
-        "isDefault": true,
+        "name": "custom-page-typography-1",
         "title": {
             "font-weight": "400",
             "font-size": 6,

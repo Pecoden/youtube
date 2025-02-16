@@ -4,7 +4,7 @@ Plugin Name: Nicepage
 Plugin URI: https://nicepage.com/
 Description: Design websites with any images and texts in seconds!
 Text Domain: nicepage
-Version: 7.4.1
+Version: 7.3.1
 Author: Nicepage https://www.nicepage.com
 Author URI: https://nicepage.com/
 */

@@ -389,6 +389,5 @@ if (!function_exists('plugin_og_meta_tags')) {
 
 require_once dirname(__FILE__) . '/includes/class-np-data-provider.php';
 require_once dirname(__FILE__) . '/options.php';
-require_once dirname(__FILE__) . '/includes/common/functions.php';
 require_once dirname(__FILE__) . '/includes/class-nicepage.php';
 require_once dirname(__FILE__) . '/includes/class-np-forms.php';

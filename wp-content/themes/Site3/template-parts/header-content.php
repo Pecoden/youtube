@@ -62,6 +62,7 @@
                 'theme_location' => 'primary-navigation-1',
                 'template' => $menu_template,
                 'mega_menu' => isset($megaMenu) ? $megaMenu : '{}',
-            )); ?>
+            )); ?><!--shopping_cart-->
+    <div class="u-shopping-cart u-shopping-cart-1"><div class="widget_shopping_cart_content"><?php theme_woocommerce_mini_cart(); ?></div></div><!--/shopping_cart-->
   </div>
 </header>

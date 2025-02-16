@@ -9,7 +9,6 @@ class Nicepage {
 
     public static $override_with_plugin = false; // header,footer,styles,scripts,fonts FROM "plugin" OR "theme"
     public static $isBlogPostTemplate = false;
-    public static $isWooShopProductTemplate = false;
 
     /**
      * Filter on the_content
@@ -19,7 +18,7 @@ class Nicepage {
      * @return string
      */
     public static function theContentFilter($content) {
-        if (self::$override_with_plugin && (self::$isBlogPostTemplate || self::$isWooShopProductTemplate)) {
+        if (self::$isBlogPostTemplate && self::$override_with_plugin) {
             return $content;
         }
         remove_action('the_content', 'Nicepage::theContentFilter'); //DISABLE looping theContentFilter
@@ -208,14 +207,6 @@ class Nicepage {
         }
         if (isset($_GET['thankYou'])) {
             $id = isset($GLOBALS['thankYouId']) ? $GLOBALS['thankYouId'] : $id;
-        }
-        if (Nicepage::$override_with_plugin) {
-            if (isset($_GET['products-list'])) {
-                $id = get_option('products_template_id') ?: 0;
-            }
-            if (isset($_GET['product-id'])) {
-                $id = get_option('product_template_id') ?: 0;
-            }
         }
         $post = get_post($id);
         if (!$post) {
@@ -524,27 +515,9 @@ class Nicepage {
         $template_type = isset($post->post_type) ? $post->post_type === 'np_shop_template' : false;
         if (self::$override_with_plugin && (is_home() || is_archive())) {
             $blog_id = get_option('blog_template_id') ?: $post->ID;
-            if ($blog_id && $post) {
-                $currentId = $post->ID;
-                $post->ID = $blog_id;
-                $template_type = true;
-            }
-        }
-        if (self::$override_with_plugin && (get_query_var('products-list', null) !== null || function_exists('wc_get_product') && (is_shop() || is_product_category()))) {
-            $products_id = get_option('products_template_id') ?: $post->ID;
-            if ($products_id && $post) {
-                $currentId = $post->ID;
-                $post->ID = $products_id;
-                $template_type = true;
-            }
-        }
-        if (self::$override_with_plugin && (get_query_var('product-id', null) !== null || function_exists('wc_get_product') && is_product())) {
-            $product_id = get_option('product_template_id') ?: $post->ID;
-            if ($product_id && $post) {
-                $currentId = $post->ID;
-                $post->ID = $product_id;
-                $template_type = true;
-            }
+            $currentId = $post->ID;
+            $post->ID = $blog_id;
+            $template_type = true;
         }
         if (self::isHtmlQuery() || (!is_singular() && !$template_type)) {
             return;
@@ -640,27 +613,9 @@ class Nicepage {
 
         if (self::$override_with_plugin && (is_home() || is_archive())) {
             $blog_id = get_option('blog_template_id') ?: $post->ID;
-            if ($blog_id && $post) {
-                $currentId = $post->ID;
-                $post_id = $blog_id;
-                $template_type = true;
-            }
-        }
-        if (self::$override_with_plugin && (get_query_var('products-list', null) !== null || function_exists('wc_get_product') && (is_shop() || is_product_category()))) {
-            $products_id = get_option('products_template_id') ?: $post->ID;
-            if ($products_id && $post) {
-                $currentId = $post->ID;
-                $post_id = $products_id;
-                $template_type = true;
-            }
-        }
-        if (self::$override_with_plugin && (get_query_var('product-id', null) !== null || function_exists('wc_get_product') && is_product())) {
-            $product_id = get_option('product_template_id') ?: $post->ID;
-            if ($product_id && $post) {
-                $currentId = $post->ID;
-                $post_id = $product_id;
-                $template_type = true;
-            }
+            $currentId = $post->ID;
+            $post_id = $blog_id;
+            $template_type = true;
         }
 
         $data_provider = np_data_provider($post_id);
@@ -840,24 +795,9 @@ SCRIPT;
         $post_id = !isset($post->ID)? get_the_ID() : $post->ID;
         if (self::$override_with_plugin && (is_home() || is_archive())) {
             $blog_id = get_option('blog_template_id') ?: $post->ID;
-            if ($blog_id && $post) {
-                $currentId = $post->ID;
-                $post->ID = $blog_id;
-            }
-        }
-        if (self::$override_with_plugin && (get_query_var('products-list', null) !== null || function_exists('wc_get_product') && (is_shop() || is_product_category()))) {
-            $products_id = get_option('products_template_id') ?: $post->ID;
-            if ($products_id && $post) {
-                $currentId = $post->ID;
-                $post->ID = $products_id;
-            }
-        }
-        if (self::$override_with_plugin && (get_query_var('product-id', null) !== null || function_exists('wc_get_product') && is_product())) {
-            $product_id = get_option('product_template_id') ?: $post->ID;
-            if ($product_id && $post) {
-                $currentId = $post->ID;
-                $post->ID = $product_id;
-            }
+            $currentId = $post->ID;
+            $post->ID = $blog_id;
+            $template_type = true;
         }
         if (self::isHtmlQuery() || (!np_data_provider($post_id)->isNp() && !self::$override_with_plugin)) {
             return;
@@ -1096,13 +1036,9 @@ SCRIPT;
         global $post;
         $postId = isset($post->ID) ? $post->ID : 0;
         $isNp = np_data_provider($postId)->isNp();
-        if (isset($post->post_type) && $post->post_type === 'template') {
-            $isNp = false;
-        }
         $fromTheme = $isNp ? '' : '&np_from=theme';
         ob_start(); ?>
         <script>
-            var _npIsCms = true;
             var _npProductsJsonUrl = '<?php echo $url . $fromTheme; ?>';
         </script>
         <?php $npProductsJsonUrl = trim(ob_get_clean());

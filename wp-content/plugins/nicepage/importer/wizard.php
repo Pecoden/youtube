@@ -249,7 +249,6 @@ class Pwizard {
             'pwizard_params',
             array(
                 'urlContent'     => admin_url("admin-ajax.php"),
-                'settingsUrl'    => admin_url('admin.php?page=np_settings'),
                 'wpnonceContent' => wp_create_nonce('np-importer'),
                 'wpnonceThemeAppearance' => wp_create_nonce('np-theme-appearance'),
                 'actionImportContent'  => 'np_import_content',

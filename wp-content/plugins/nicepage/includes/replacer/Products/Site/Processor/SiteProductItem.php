@@ -52,7 +52,7 @@ class SiteProductItem extends ProductItem {
         }
         $content = preg_replace('/<!--product_item-->([\s\S]+)<!--\/product_item-->/', $allProductsHtml, $content);
         $content = NpAdminActions::processPagination($content, 'products', $this->_options['siteProductsProcess']);
-        $content = NpAdminActions::processCategoriesFilter($content, $this->_options, 'np_products');
+        $content = $this->processCategoriesFilter($content);
         $content = $this->_buildGridAutoRows($products, $this->_options, $content);
         return $content;
     }
@@ -130,8 +130,7 @@ class SiteProductItem extends ProductItem {
      * @return string $content
      */
     protected function _replaceTitleUrl($content) {
-        $prefix = Nicepage::$override_with_plugin && (isset($_GET['products-list']) || isset($_GET['product-id'])) ? 'product-id' : 'productId';
-        $postUrl = $this->productData['product']['id'] ? home_url('?' . $prefix . '=' . $this->productData['product']['id']) : '';
+        $postUrl = $this->productData['product']['id'] ? home_url('?productId=' . $this->productData['product']['id']) : '';
         $postUrl = $postUrl ? $postUrl : '#';
         if ($postUrl) {
             $content = preg_replace('/href=[\'|"][\s\S]+?[\'|"]/', 'href="' . $postUrl . '"', $content);
@@ -198,8 +197,7 @@ class SiteProductItem extends ProductItem {
                 $imageHtml = $imageMatch[1];
                 $url = $this->productData['image_url'];
                 $isBackgroundImage = strpos($imageHtml, '<div') !== false ? true : false;
-                $prefix = Nicepage::$override_with_plugin && (isset($_GET['products-list']) || isset($_GET['product-id'])) ? 'product-id' : 'productId';
-                $link = $this->productData['product']['id'] ? home_url('?' . $prefix . '=' . $this->productData['product']['id']) : '#';
+                $link = $this->productData['product']['id'] ? home_url('?productId=' . $this->productData['product']['id']) : '#';
                 if (preg_match('/href="product-[\d]+?"/', $imageHtml, $matches)) {
                     $imageHtml = str_replace($matches[0], 'href="product-' . $this->productData['product']['id'] . '"', $imageHtml);
                 }

@@ -18,11 +18,9 @@ var Pwizard = (function($){
         theme_appearance_update: function() {
 
             function stopWithError(msg) {
-                var settingsUrl = pwizard_params.settingsUrl || '#';
                 $('.pwizard-wrap')
                     .removeClass('spinning')
-                    .html(`<p>Failed to set option. An error occurred: <span style="color: red;">${msg}</span></p>
-                           <p>You can set it in the <a href="${settingsUrl}">Plugin Settings</a></p>`);
+                    .html(`<p>Failed to update option. An error occurred: <span style="color: red;">${msg}</span></p>`);
             }
 
             var selectedOption = $('#np_theme_appearance').val();
@@ -46,10 +44,6 @@ var Pwizard = (function($){
                 error: function(xhr, status, error) {
                     stopWithError(error);
                 }
-            }).fail(function(xhr, status, error) {
-                console.error(`AJAX fail: ${status} - ${error}`);
-                console.error(xhr.responseText);
-                stopWithError(error || 'An unknown error occurred.');
             });
         }
     };

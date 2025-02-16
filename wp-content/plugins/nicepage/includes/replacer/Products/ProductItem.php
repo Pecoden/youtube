@@ -270,18 +270,14 @@ abstract class ProductItem {
         return preg_replace('/(<form[\s\S]*?>)([\s\S]+?)(<\/form>)/', '$1' . $content . $add_to_cart . '$3', $form);
     }
 
-    public static $uniqueId;
-
     /**
-     * Replace placeholders with actual tab data.
+     * Replace placeholder for product tabs
      *
      * @param string $content
      *
      * @return string $content
      */
     protected function _replaceTabs($content) {
-        //Correct placeholders for tabs
-        $content = $this->_adjustTabPlaceholders($content);
         return preg_replace_callback(
             '/<!--product_tabs-->([\s\S]+?)<!--\/product_tabs-->/',
             function ($product_tabs) {
@@ -298,37 +294,6 @@ abstract class ProductItem {
     }
 
     /**
-     * Adjust the number of tab placeholders in the HTML based on the number of tabs in the data.
-     *
-     * @param string $content
-     *
-     * @return string $content
-     */
-    protected function _adjustTabPlaceholders($content) {
-        if (empty($this->productData['tabs'])) {
-            return $content;
-        }
-        preg_match_all('/<!--product_tabitem-->([\s\S]+?)<!--\/product_tabitem-->/', $content, $tabItemMatches);
-        preg_match_all('/<!--product_tabpane-->([\s\S]+?)<!--\/product_tabpane-->/', $content, $tabPaneMatches);
-        if (empty($tabItemMatches[0]) || empty($tabPaneMatches[0])) {
-            return $content;
-        }
-        $tabItemPlaceholders = $tabItemMatches[0];
-        $tabPanePlaceholders = $tabPaneMatches[0];
-        $numDataTabs = count($this->productData['tabs']);
-        $numPlaceholdersTab = count($tabItemPlaceholders);
-        if ($numDataTabs > $numPlaceholdersTab) {
-            $firstTabItem = $tabItemPlaceholders[0];
-            $firstTabPane = $tabPanePlaceholders[0];
-            for ($i = $numPlaceholdersTab; $i < $numDataTabs; $i++) {
-                $content = str_replace($firstTabItem, $firstTabItem . $this->_cloneTabItem($firstTabItem, $i), $content);
-                $content = str_replace($firstTabPane, $firstTabPane . $this->_cloneTabPane($firstTabPane, $i), $content);
-            }
-        }
-        return $content;
-    }
-
-    /**
      * Replace placeholder for product tab item
      *
      * @param string $content
@@ -339,14 +304,13 @@ abstract class ProductItem {
         return preg_replace_callback(
             '/<!--product_tabitem-->([\s\S]+?)<!--\/product_tabitem-->/',
             function ($productTabsHtml) {
-                static $index = 0;
                 $productTabsHtml = $productTabsHtml[1];
-                if (isset($this->productData['tabs'][$index])) {
-                    $productTabsHtml = $this->_replaceTabItemTitle($productTabsHtml, $this->productData['tabs'][$index]['title']);
-                    $index++;
+                if (isset($this->productData['tabs'][$this->tabItemIndex])) {
+                    $productTabsHtml = $this->_replaceTabItemTitle($productTabsHtml);
                 } else {
                     return '';
                 }
+                $this->tabItemIndex++;
                 return $productTabsHtml;
             },
             $content
@@ -357,12 +321,12 @@ abstract class ProductItem {
      * Replace placeholder for product tab item title
      *
      * @param string $content
-     * @param string $title
      *
      * @return string $content
      */
-    private function _replaceTabItemTitle($content, $title) {
-        return preg_replace('/<!--product_tabitem_title-->([\s\S]*)<!--\/product_tabitem_title-->/', sprintf(__('%s', 'woocommerce'), $title), $content);
+    private function _replaceTabItemTitle($content) {
+        $title = sprintf(__('%s', 'woocommerce'), $this->productData['tabs'][$this->tabItemIndex]['title']);
+        return preg_replace('/<!--product_tabitem_title-->([\s\S]*)<!--\/product_tabitem_title-->/', $title, $content);
     }
 
     /**
@@ -376,14 +340,13 @@ abstract class ProductItem {
         return preg_replace_callback(
             '/<!--product_tabpane-->([\s\S]+?)<!--\/product_tabpane-->/',
             function ($productTabsHtml) {
-                static $index = 0;
                 $productTabsHtml = $productTabsHtml[1];
-                if (isset($this->productData['tabs'][$index])) {
-                    $productTabsHtml = $this->_replaceTabPaneContent($productTabsHtml, $this->productData['tabs'][$index]['content']);
-                    $index++;
+                if (isset($this->productData['tabs'][$this->tabContentIndex])) {
+                    $productTabsHtml = $this->_replaceTabPaneContent($productTabsHtml);
                 } else {
                     return '';
                 }
+                $this->tabContentIndex++;
                 return $productTabsHtml;
             },
             $content
@@ -394,71 +357,11 @@ abstract class ProductItem {
      * Replace placeholder for product tab panel content
      *
      * @param string $content
-     * @param string $tabContent
      *
      * @return string $content
      */
-    private function _replaceTabPaneContent($content, $tabContent) {
-        return preg_replace('/<!--product_tabpane_content-->([\s\S]*)<!--\/product_tabpane_content-->/', $tabContent, $content);
-    }
-
-    /**
-     * Clone a tab item and update its unique attributes.
-     *
-     * @param string $tabItem
-     * @param int    $index
-     *
-     * @return string $tabItem
-     */
-    private function _cloneTabItem($tabItem, $index) {
-        self::$uniqueId = 'tab-' . substr(uniqid(), -5) . $index;
-        $isActive = $index === 0 ? 'active' : '';
-        if ($index !== 0) {
-            $tabItem = preg_replace('/\bactive\b/', '', $tabItem);
-        }
-        return preg_replace(
-            [
-                '/id="link-tab-[^"]+"/',
-                '/href="#tab-[^"]+"/',
-                '/aria-controls="tab-[^"]+"/',
-                '/<a\s+class="([^"]*)"/'
-            ],
-            [
-                'id="link-' . self::$uniqueId . '"',
-                'href="#' . self::$uniqueId . '"',
-                'aria-controls="' . self::$uniqueId . '"',
-                '<a class="$1 ' . $isActive . '"'
-            ],
-            $tabItem
-        );
-    }
-
-    /**
-     * Clone a tab pane and update its unique attributes.
-     *
-     * @param string $tabPane
-     * @param int    $index
-     *
-     * @return string $tabPane
-     */
-    private function _cloneTabPane($tabPane, $index) {
-        $isActive = $index === 0 ? 'u-tab-active' : '';
-        if ($index !== 0) {
-            $tabPane = preg_replace('/\bu-tab-active\b/', '', $tabPane);
-        }
-        return preg_replace(
-            [
-                '/id="tab-[^"]+"/',
-                '/aria-labelledby="link-tab-[^"]+"/',
-                '/class="([^"]*)"/'
-            ],
-            [
-                'id="' . self::$uniqueId . '"',
-                'aria-labelledby="link-' . self::$uniqueId . '"',
-                'class="$1 ' . $isActive . '"'
-            ],
-            $tabPane
-        );
+    private function _replaceTabPaneContent($content) {
+        return preg_replace('/<!--product_tabpane_content-->([\s\S]*)<!--\/product_tabpane_content-->/', $this->productData['tabs'][$this->tabContentIndex]['content'], $content);
     }
 
     /**
@@ -657,5 +560,79 @@ abstract class ProductItem {
             $productsHtml .= GridHelper::buildGridAutoRowsStyles($productsGridProps, count($products));
         }
         return $productsHtml;
+    }
+
+    /**
+     * Process categories filter for products controls
+     *
+     * @param string $content
+     *
+     * @return string $content
+     */
+    public function processCategoriesFilter($content) {
+        $content = preg_replace_callback(
+            '/<\!--products_categories_filter_select-->([\s\S]+?)<\!--\/products_categories_filter_select-->/',
+            function ($selectMatch) {
+                $selectHtml = $selectMatch[1];
+                preg_match('/<option[\s\S]*?>[\s\S]+?<\/option>/', $selectHtml, $selectOptions);
+                $firstOptionHtml = $selectOptions[0];
+                $selectHtml = preg_replace('/<option[\s\S]*?>[\s\S]*<\/option>/', '{categoriesFilterOptions}', $selectHtml);
+                if ($this->_options['siteProductsProcess']) {
+                    $categories = isset($this->_options['productsJson']['categories']) ? $this->_options['productsJson']['categories'] : array();
+                } else {
+                    $categories = class_exists('Woocommerce') ? get_terms('product_cat', array('hide_empty' => false)) : array();
+                }
+                $selectOptionsHtml = '';
+                // add item all
+                $activeFilter = isset($_GET['categoryId']) ? $_GET['categoryId'] : false;
+                $OptionAllProducts = preg_replace('/value=[\'"][\s\S]*?[\'"]/', 'value=""', $firstOptionHtml);
+                $OptionAllProducts = preg_replace('/(<option[\s\S]*?>)[\s\S]+?<\/option>/', '$1' . __('All', 'nicepage') . '</option>', $OptionAllProducts);
+                $selectOptionsHtml .= $OptionAllProducts;
+                // add item featured
+                $OptionFeaturedProducts = preg_replace('/value=[\'"][\s\S]*?[\'"]/', 'value="featured"', $firstOptionHtml);
+                $OptionFeaturedProducts = preg_replace('/(<option[\s\S]*?>)[\s\S]+?<\/option>/', '$1' . __('Featured', 'nicepage') . '</option>', $OptionFeaturedProducts);
+                if (!$this->_options['siteProductsProcess'] && $activeFilter && 'featured' === $activeFilter) {
+                    $OptionFeaturedProducts = str_replace('<option', '<option selected="selected"', $OptionFeaturedProducts);
+                }
+                $selectOptionsHtml .= $OptionFeaturedProducts;
+                // add all categories with hierarchy
+                $selectOptionsHtml .= $this->_generate_category_options($categories, $firstOptionHtml);
+                $selectHtml = str_replace('{categoriesFilterOptions}', $selectOptionsHtml, $selectHtml);
+                return $selectHtml;
+            },
+            $content
+        );
+        return $content;
+    }
+
+    /**
+     * Generate categories filter options with hierarchy
+     *
+     * @param array  $categories
+     * @param string $itemTemplate
+     * @param int    $parent
+     * @param string $prefix
+     *
+     * @return string $result
+     */
+    private function _generate_category_options( $categories, $itemTemplate, $parent = 0, $prefix = '' ) {
+        $result = '';
+        $activeFilter = isset($_GET['categoryId']) ? $_GET['categoryId'] : false;
+        foreach ($categories as $category) {
+            $parentId = $this->_options['siteProductsProcess'] ? $category['categoryId'] : $category->parent;
+            $catId = $this->_options['siteProductsProcess'] ? $category['id'] : $category->term_id;
+            $catName = $this->_options['siteProductsProcess'] ? $category['title'] : $category->name;
+            if ($parentId == $parent) {
+                $doubleOptionHtml = $itemTemplate;
+                $doubleOptionHtml = preg_replace('/value=[\'"][\s\S]*?[\'"]/', 'value="' . $catId . '"', $doubleOptionHtml);
+                $doubleOptionHtml = preg_replace('/(<option[\s\S]*?>)[\s\S]+?<\/option>/', '$1' . $prefix . $catName . '</option>', $doubleOptionHtml);
+                if (!$this->_options['siteProductsProcess'] && $activeFilter && (int)$catId === (int)$activeFilter) {
+                    $doubleOptionHtml = str_replace('<option', '<option selected="selected"', $doubleOptionHtml);
+                }
+                $result .= $doubleOptionHtml;
+                $result .= $this->_generate_category_options($categories, $itemTemplate, $catId, $prefix . '-');
+            }
+        }
+        return $result;
     }
 }

@@ -3603,22 +3603,6 @@
 .u-xs  .u-pagination.responsive-style2 .u-pagination-item.active ~ .u-pagination-item:nth-last-child(3) {
   display: none;
 }
-.u-xs .u-list-control {
-  justify-content: center;
-}
-.u-xs .u-list-control.has-categories-listbox.has-sorting,
-.u-xs .u-list-control.has-pagination.has-categories-listbox,
-.u-xs .u-list-control.has-pagination.has-sorting {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.u-xs .u-list-control.has-categories-listbox.has-sorting > *,
-.u-xs .u-list-control.has-pagination.has-categories-listbox > *,
-.u-xs .u-list-control.has-pagination.has-sorting > * {
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
 .u-sm .u-table-responsive,
 .u-xs .u-table-responsive {
   overflow-x: auto;
@@ -3651,21 +3635,20 @@
   flex-wrap: wrap;
 }
 .u-sm .u-calendar .u-calendar-time-container {
-  margin-left: auto !important;
+  margin-left: auto;
   margin-right: auto;
 }
 .u-xs .u-calendar {
   flex-wrap: wrap;
 }
 .u-xs .u-calendar .u-calendar-time-container {
-  margin-left: auto !important;
+  margin-left: auto;
   margin-right: auto;
   width: 100%;
 }
 .u-xs .u-calendar .u-calendar-time-container ul.u-calendar-time-list {
   height: auto !important;
-  display: grid !important;
-  grid-template-columns: repeat(3, 33.33333333%);
+  display: block;
 }
 .u-sm .u-calendar {
   flex-wrap: wrap;

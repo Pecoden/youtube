@@ -51,8 +51,8 @@
                 <div class="u-old-price" style="text-decoration: line-through !important;"><?php echo $productData['price_old']; ?></div><!--/product_old_price--><!--product_regular_price-->
                 <div class="u-price u-text-palette-2-base" style="font-size: 1.25rem; font-weight: 700;"><?php echo $productData['price']; ?></div><!--/product_regular_price-->
               </div>
-            </div><!--/product_price--><!--product_button--><!--options_json--><!--{"clickType":"buy-now","content":"Buy Now"}--><!--/options_json-->
-            <a href="#popup-01f8" class="u-align-center u-border-2 u-border-grey-25 u-btn u-btn-rectangle u-button-style u-none u-product-control u-text-body-color u-btn-1 u-dialog-link u-payment-button" data-product-button-click-type="buy-now" data-product-id="<?php echo $productId; ?>" data-product="<?php echo $productJson; ?>"><!--product_button_content-->Buy Now<!--/product_button_content--></a><!--/product_button-->
+            </div><!--/product_price--><!--product_button--><!--options_json--><!--{"clickType":"add-to-cart","content":""}--><!--/options_json-->
+            <a href="#" class="u-align-center u-border-2 u-border-grey-25 u-btn u-btn-rectangle u-button-style u-none u-product-control u-text-body-color u-btn-1 u-add-to-cart-link u-add-to-cart-link" data-product-button-click-type="add-to-cart" data-product-id="<?php echo $productId; ?>" data-product="<?php echo $productJson; ?>"><!--product_button_content-->Add to Cart<!--/product_button_content--></a><!--/product_button-->
           </div>
         </div><!--/product_item--><?php } ?><?php if ($templateOrder == 1) { ?><!--product_item-->
         <div class="u-align-center u-container-align-center u-container-style u-products-item u-repeater-item u-white u-repeater-item-2" data-product-id="5">
@@ -67,8 +67,8 @@
                 <div class="u-old-price" style="text-decoration: line-through !important;"><?php echo $productData['price_old']; ?></div><!--/product_old_price--><!--product_regular_price-->
                 <div class="u-price u-text-palette-2-base" style="font-size: 1.25rem; font-weight: 700;"><?php echo $productData['price']; ?></div><!--/product_regular_price-->
               </div>
-            </div><!--/product_price--><!--product_button--><!--options_json--><!--{"clickType":"buy-now","content":"Buy Now"}--><!--/options_json-->
-            <a href="#popup-01f8" class="u-align-center u-border-2 u-border-grey-25 u-btn u-btn-rectangle u-button-style u-none u-product-control u-text-body-color u-btn-2 u-dialog-link u-payment-button" data-product-button-click-type="buy-now" data-product-id="<?php echo $productId; ?>" data-product="<?php echo $productJson; ?>"><!--product_button_content-->Buy Now<!--/product_button_content--></a><!--/product_button-->
+            </div><!--/product_price--><!--product_button--><!--options_json--><!--{"clickType":"add-to-cart","content":""}--><!--/options_json-->
+            <a href="#" class="u-align-center u-border-2 u-border-grey-25 u-btn u-btn-rectangle u-button-style u-none u-product-control u-text-body-color u-btn-2 u-add-to-cart-link u-add-to-cart-link" data-product-button-click-type="add-to-cart" data-product-id="<?php echo $productId; ?>" data-product="<?php echo $productJson; ?>"><!--product_button_content-->Add to Cart<!--/product_button_content--></a><!--/product_button-->
           </div>
         </div><!--/product_item--><?php } ?><?php if ($templateOrder == 2) { ?><!--product_item-->
         <div class="u-align-center u-container-align-center u-container-style u-products-item u-repeater-item u-white u-repeater-item-3" data-product-id="6">
@@ -83,8 +83,8 @@
                 <div class="u-old-price" style="text-decoration: line-through !important;"><?php echo $productData['price_old']; ?></div><!--/product_old_price--><!--product_regular_price-->
                 <div class="u-price u-text-palette-2-base" style="font-size: 1.25rem; font-weight: 700;"><?php echo $productData['price']; ?></div><!--/product_regular_price-->
               </div>
-            </div><!--/product_price--><!--product_button--><!--options_json--><!--{"clickType":"buy-now","content":"Buy Now"}--><!--/options_json-->
-            <a href="#popup-01f8" class="u-align-center u-border-2 u-border-grey-25 u-btn u-btn-rectangle u-button-style u-none u-product-control u-text-body-color u-btn-3 u-dialog-link u-payment-button" data-product-button-click-type="buy-now" data-product-id="<?php echo $productId; ?>" data-product="<?php echo $productJson; ?>"><!--product_button_content-->Buy Now<!--/product_button_content--></a><!--/product_button-->
+            </div><!--/product_price--><!--product_button--><!--options_json--><!--{"clickType":"add-to-cart","content":""}--><!--/options_json-->
+            <a href="#" class="u-align-center u-border-2 u-border-grey-25 u-btn u-btn-rectangle u-button-style u-none u-product-control u-text-body-color u-btn-3 u-add-to-cart-link u-add-to-cart-link" data-product-button-click-type="add-to-cart" data-product-id="<?php echo $productId; ?>" data-product="<?php echo $productJson; ?>"><!--product_button_content-->Add to Cart<!--/product_button_content--></a><!--/product_button-->
           </div>
         </div><!--/product_item--><?php } ?><?php if ($templateOrder == 3) { ?><!--product_item-->
         <div class="u-align-center u-container-align-center u-container-style u-products-item u-repeater-item u-white u-repeater-item-4" data-product-id="6">
@@ -99,8 +99,8 @@
                 <div class="u-old-price" style="text-decoration: line-through !important;"><?php echo $productData['price_old']; ?></div><!--/product_old_price--><!--product_regular_price-->
                 <div class="u-price u-text-palette-2-base" style="font-size: 1.25rem; font-weight: 700;"><?php echo $productData['price']; ?></div><!--/product_regular_price-->
               </div>
-            </div><!--/product_price--><!--product_button--><!--options_json--><!--{"clickType":"buy-now","content":"Buy Now"}--><!--/options_json-->
-            <a href="#popup-01f8" class="u-align-center u-border-2 u-border-grey-25 u-btn u-btn-rectangle u-button-style u-none u-product-control u-text-body-color u-btn-4 u-dialog-link u-payment-button" data-product-button-click-type="buy-now" data-product-id="<?php echo $productId; ?>" data-product="<?php echo $productJson; ?>"><!--product_button_content-->Buy Now<!--/product_button_content--></a><!--/product_button-->
+            </div><!--/product_price--><!--product_button--><!--options_json--><!--{"clickType":"add-to-cart","content":""}--><!--/options_json-->
+            <a href="#" class="u-align-center u-border-2 u-border-grey-25 u-btn u-btn-rectangle u-button-style u-none u-product-control u-text-body-color u-btn-4 u-add-to-cart-link u-add-to-cart-link" data-product-button-click-type="add-to-cart" data-product-id="<?php echo $productId; ?>" data-product="<?php echo $productJson; ?>"><!--product_button_content-->Add to Cart<!--/product_button_content--></a><!--/product_button-->
           </div>
         </div><!--/product_item--><?php } ?><?php if ($templateOrder == 4) { ?><!--product_item-->
         <div class="u-align-center u-container-align-center u-container-style u-products-item u-repeater-item u-white u-repeater-item-5" data-product-id="6">
@@ -115,8 +115,8 @@
                 <div class="u-old-price" style="text-decoration: line-through !important;"><?php echo $productData['price_old']; ?></div><!--/product_old_price--><!--product_regular_price-->
                 <div class="u-price u-text-palette-2-base" style="font-size: 1.25rem; font-weight: 700;"><?php echo $productData['price']; ?></div><!--/product_regular_price-->
               </div>
-            </div><!--/product_price--><!--product_button--><!--options_json--><!--{"clickType":"buy-now","content":"Buy Now"}--><!--/options_json-->
-            <a href="#popup-01f8" class="u-align-center u-border-2 u-border-grey-25 u-btn u-btn-rectangle u-button-style u-none u-product-control u-text-body-color u-btn-5 u-dialog-link u-payment-button" data-product-button-click-type="buy-now" data-product-id="<?php echo $productId; ?>" data-product="<?php echo $productJson; ?>"><!--product_button_content-->Buy Now<!--/product_button_content--></a><!--/product_button-->
+            </div><!--/product_price--><!--product_button--><!--options_json--><!--{"clickType":"add-to-cart","content":""}--><!--/options_json-->
+            <a href="#" class="u-align-center u-border-2 u-border-grey-25 u-btn u-btn-rectangle u-button-style u-none u-product-control u-text-body-color u-btn-5 u-add-to-cart-link u-add-to-cart-link" data-product-button-click-type="add-to-cart" data-product-id="<?php echo $productId; ?>" data-product="<?php echo $productJson; ?>"><!--product_button_content-->Add to Cart<!--/product_button_content--></a><!--/product_button-->
           </div>
         </div><!--/product_item--><?php } ?><?php if ($templateOrder == 5) { ?><!--product_item-->
         <div class="u-align-center u-container-align-center u-container-style u-products-item u-repeater-item u-white u-repeater-item-6" data-product-id="6">
@@ -131,8 +131,8 @@
                 <div class="u-old-price" style="text-decoration: line-through !important;"><?php echo $productData['price_old']; ?></div><!--/product_old_price--><!--product_regular_price-->
                 <div class="u-price u-text-palette-2-base" style="font-size: 1.25rem; font-weight: 700;"><?php echo $productData['price']; ?></div><!--/product_regular_price-->
               </div>
-            </div><!--/product_price--><!--product_button--><!--options_json--><!--{"clickType":"buy-now","content":"Buy Now"}--><!--/options_json-->
-            <a href="#popup-01f8" class="u-align-center u-border-2 u-border-grey-25 u-btn u-btn-rectangle u-button-style u-none u-product-control u-text-body-color u-btn-6 u-dialog-link u-payment-button" data-product-button-click-type="buy-now" data-product-id="<?php echo $productId; ?>" data-product="<?php echo $productJson; ?>"><!--product_button_content-->Buy Now<!--/product_button_content--></a><!--/product_button-->
+            </div><!--/product_price--><!--product_button--><!--options_json--><!--{"clickType":"add-to-cart","content":""}--><!--/options_json-->
+            <a href="#" class="u-align-center u-border-2 u-border-grey-25 u-btn u-btn-rectangle u-button-style u-none u-product-control u-text-body-color u-btn-6 u-add-to-cart-link u-add-to-cart-link" data-product-button-click-type="add-to-cart" data-product-id="<?php echo $productId; ?>" data-product="<?php echo $productJson; ?>"><!--product_button_content-->Add to Cart<!--/product_button_content--></a><!--/product_button-->
           </div>
         </div><!--/product_item--><?php } ?><?php } ?>
       </div>

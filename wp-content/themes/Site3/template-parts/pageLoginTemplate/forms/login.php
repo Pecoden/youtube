@@ -9,7 +9,7 @@
         </div>
         <div class="u-form-checkbox u-form-group">
           <input type="checkbox" id="checkbox-a30d" name="rememberme" value="On" class="u-field-input">
-          <label for="checkbox-a30d" class="u-block-a0a7-32 u-field-label" style="" name=""><?php _e( 'Remember Me' ); ?></label>
+          <label for="checkbox-a30d" class="u-block-4146-32 u-field-label" style="" name=""><?php _e( 'Remember Me' ); ?></label>
         </div>
         <div class="u-align-left u-form-group u-form-submit">
           <a href="#" class="u-btn u-btn-submit u-button-style u-btn-1"><?php _e( 'Log in' ); ?></a>

@@ -112,12 +112,6 @@ class NpMultiLanguages
             if (isset($_GET['productId'])) {
                 $location = add_query_arg(array('productId' => $_GET['productId']), $location);
             }
-            if (isset($_GET['products-list'])) {
-                $location = add_query_arg(array('products-list' => ''), $location);
-            }
-            if (isset($_GET['product-id'])) {
-                $location = add_query_arg(array('product-id' => $_GET['product-id']), $location);
-            }
             global $post;
             $data_provider = np_data_provider($post->ID);
             $isPreview = $data_provider->isPreview();
@@ -359,12 +353,6 @@ class NpMultiLanguages
         }
         if (isset($_GET['productId'])) {
             $url = add_query_arg(array('productId' => $_GET['productId']), $url);
-        }
-        if (isset($_GET['products-list'])) {
-            $url = add_query_arg(array('products-list' => ''), $url);
-        }
-        if (isset($_GET['product-id'])) {
-            $url = add_query_arg(array('product-id' => $_GET['product-id']), $url);
         }
         return $url;
     }

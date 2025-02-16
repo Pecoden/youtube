@@ -67,8 +67,7 @@ class NpDataProduct {
      * @return string $title
      */
     public static function getProductTitle() {
-        $title = self::$product->get_title();
-        return apply_filters('woocommerce_product_title', $title, self::$product);
+        return $title = self::$product->get_title();
     }
 
     /**
@@ -78,8 +77,7 @@ class NpDataProduct {
      */
     public static function getProductShortDesc() {
         $product_id  = self::$product->get_id();
-        $desc = plugin_trim_long_str(NpAdminActions::getTheExcerpt($product_id), 250);
-        return apply_filters('woocommerce_short_description', $desc);
+        return $desc = plugin_trim_long_str(NpAdminActions::getTheExcerpt($product_id), 250);
     }
 
     /**
@@ -88,8 +86,7 @@ class NpDataProduct {
      * @return string $fullDesc
      */
     public static function getProductFullDesc() {
-        $fullDesc = wpautop(self::$product->get_description());
-        return apply_filters('the_content', $fullDesc);
+        return $fullDesc = wpautop(self::$product->get_description());
     }
 
     /**
@@ -226,8 +223,7 @@ class NpDataProduct {
                 $price = wc_price(self::$product->get_variation_sale_price('min', true)) . ' - ' . wc_price(self::$product->get_variation_sale_price('max', true));
             }
         }
-        $price_suffix = self::$product->get_price_suffix();
-        return $price . '<span style="color:rgb(0, 0, 0);margin-left: 6px;font-size: 94%;">' . apply_filters('woocommerce_get_price_suffix', $price_suffix, self::$product, $price, 1) . '</span>';
+        return $price . '<span style="color:rgb(0, 0, 0);margin-left: 6px;font-size: 94%;">' . self::$product->get_price_suffix() . '</span>';
     }
 
     /**
@@ -295,87 +291,45 @@ class NpDataProduct {
      *
      * @return array $tabs
      */
-    /**
-     * Get product default tabs
-     *
-     * @return array $tabs
-     */
     public static function getProductDefaultProductTabs() {
-        if (!isset(self::$product) || !self::$product instanceof WC_Product) {
-            return array();
-        }
         $product_id = self::$product->get_id();
-        if (!$product_id) {
-            return array();
-        }
-
-        global $post, $product;
+        global $post;
         $postId = isset($post->ID) ? $post->ID : 0;
         $isNp = np_data_provider($postId)->isNp();
         $post_old = $post;
         $post = get_post($product_id);
         $post->isNp = $isNp;
         remove_filter('comments_template', array('WC_Template_Loader', 'comments_template_loader'));
-        $product = self::$product;
-        $tabs = apply_filters('woocommerce_product_tabs', array());
-        if (!is_array($tabs)) {
-            error_log('woocommerce_product_tabs returned non-array: ' . print_r($tabs, true));
-            $tabs = array();
-        }
-        if (empty($tabs)) {
-            $review_count = self::$product->get_review_count();
-
-            $tabs['description'] = array(
-                'title'    => __('Description', 'woocommerce'),
-                'priority' => 10,
-                'callback' => array(__CLASS__, 'productDescriptionTab'),
-            );
-            $tabs['reviews'] = array(
-                'title'    => sprintf(__('Reviews (%d)', 'woocommerce'), $review_count),
-                'priority' => 30,
-                'callback' => array(__CLASS__, 'productReviewsTab'),
-            );
-        }
-        $resultTabs = array();
-        foreach ($tabs as $key => $tab) {
-            ob_start();
-            if (isset($tab['callback'])) {
-                call_user_func($tab['callback'], $key, $tab);
+        $parameters['description'] = array(
+            'title'    => __('Description', 'woocommerce'),
+            'priority' => 10
+        );
+        $parameters['reviews'] = array(
+            'title'    => sprintf(__('Reviews (%d)', 'woocommerce'), self::$product->get_review_count()),
+            'priority' => 30,
+            'callback' => 'comments_template',
+        );
+        $tabs = array();
+        foreach ($parameters as $key => $parameter) {
+            if ($key == "description") {
+                $heading = apply_filters('woocommerce_product_description_heading', __('Description', 'woocommerce'));
+                $content = '<h2>' . esc_html($heading) . '</h2>' . self::$product->get_description();
+            } else {
+                global $product;
+                $product = self::getProduct($product_id) === null ? $product : self::getProduct($product_id);
+                global $withcomments;
+                $withcomments = true;
+                ob_start();
+                comments_template();
+                $content = ob_get_clean();
             }
-            $content = ob_get_clean();
-            $resultTabs[] = array(
-                'title'   => $tab['title'],
+            $tabs[] = array (
+                'title'   => $parameter['title'],
                 'content' => $content,
             );
         }
         $post = $post_old;
-        return $resultTabs;
-    }
-
-    /**
-     * Callback for tab Description.
-     *
-     * @param string $key Key name.
-     * @param array  $tab Tab data.
-     */
-    public static function productDescriptionTab($key, $tab) {
-        $heading = apply_filters('woocommerce_product_description_heading', __('Description', 'woocommerce'));
-        echo '<h2>' . esc_html($heading) . '</h2>';
-        echo self::$product->get_description();
-    }
-
-    /**
-     * Callback for tab Reviews.
-     *
-     * @param string $key Key name.
-     * @param array  $tab Tab data.
-     */
-    public static function productReviewsTab($key, $tab) {
-        global $product;
-        $product = self::getProduct(self::$product->get_id()) === null ? $product : self::getProduct(self::$product->get_id());
-        global $withcomments;
-        $withcomments = true;
-        comments_template();
+        return $tabs;
     }
 
     /**
@@ -421,7 +375,7 @@ class NpDataProduct {
             __('%s', 'woocommerce'),
             NpDataProduct::getProductAddToCartText($product)
         );
-        if (!Nicepage::$isWooShopProductTemplate && ($button_text && isset($options['content']) && $options['content'])) {
+        if ($button_text && isset($options['content']) && $options['content']) {
             $button_text = $button_text === 'Add to cart' && $options['content'] === 'Select options' ? $button_text : $options['content'];
         }
         $button_html = apply_filters(
@@ -436,9 +390,6 @@ class NpDataProduct {
             ),
             $product
         );
-        if (Nicepage::$isWooShopProductTemplate) {
-            $button_html = preg_replace('/<!--product_button_content-->[\s\S]+?<!--\/product_button_content-->/', $button_text, $button_html);
-        }
         return $button_html;
     }
 
@@ -452,11 +403,12 @@ class NpDataProduct {
      */
     public static function getProductVariationTitle($attribute, $productAttribute) {
         if (isset($attribute->name)) {
-            return $attribute->name;
+            $variation_title = $attribute->name;
+        } else {
+            $attr_object = $productAttribute->get_taxonomy_object();
+            $variation_title = $attr_object->attribute_label ? $attr_object->attribute_label : $attr_object->attribute_name;
         }
-
-        $attr_object = $productAttribute->get_taxonomy_object();
-        return $attr_object->attribute_label ?: $attr_object->attribute_name;
+        return $variation_title;
     }
 
     /**
@@ -470,7 +422,7 @@ class NpDataProduct {
         if (is_string($variation_option)) {
             return $variation_option;
         }
-        return $variation_option->name ? strtolower($variation_option->name) : '';
+        return $variation_option_title = $variation_option->name ? strtolower($variation_option->name) : '';
     }
 
 }
@@ -481,7 +433,7 @@ class NpDataProduct {
 function add_shop_scripts() {
     global $post;
     $post_id = isset($post->ID) ? $post->ID : 0;
-    if (class_exists('WooCommerce') && np_data_provider($post_id)->isNp()) {
+    if (np_data_provider($post_id)->isNp() && class_exists('WooCommerce')) {
         wp_register_script('woocommerce-np-scripts', APP_PLUGIN_URL . 'includes/woocommerce/js/woocommerce-np-scripts.js', array('jquery'), time());
         wp_enqueue_script('woocommerce-np-scripts');
         wp_register_style("woocommerce-np-styles", APP_PLUGIN_URL . 'includes/woocommerce/css/woocommerce-np-styles.css', APP_PLUGIN_VERSION);

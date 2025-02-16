@@ -12,7 +12,6 @@ class WooProductListProcessor extends WooProductItem {
     public function __construct( $html, $options ) {
         $this->_html    = $html;
         $this->_options = $options;
-        $GLOBALS['addToCartClasses'] = $this->getAddToCartClasses($html);
         parent::__construct($options);
     }
 
@@ -23,10 +22,6 @@ class WooProductListProcessor extends WooProductItem {
      */
     public function build() {
         $products = $this->getProducts($this->_options);
-        if (get_option('np_theme_appearance') === 'plugin-option' && function_exists('wc_get_product') && (is_shop() || is_product_category())) {
-            global $wp_query;
-            $products = isset($wp_query->posts) ? $wp_query->posts : $products;
-        }
         if (count($products) < 1) {
             $this->_html = '';
             return;
@@ -50,21 +45,5 @@ class WooProductListProcessor extends WooProductItem {
      */
     public function getResult() {
         return $this->_html;
-    }
-
-    /**
-     * Get add to cart button css classes
-     *
-     * @param string $html
-     *
-     * @return mixed|string
-     */
-    public function getAddToCartClasses($html) {
-        $pattern = '/<!-- {{add_to_cart_button_classes: ?(.*?) ?}} -->/';
-        if (preg_match($pattern, $html, $matches)) {
-            return isset($matches[1]) ? $matches[1] : '';
-        } else {
-            return '';
-        }
     }
 }

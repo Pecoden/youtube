@@ -121,7 +121,7 @@ class NpGetSiteAction extends NpAction {
             'items' => self::_getItems(),
             'settings' => $site_settings,
             'isFullLoaded' => true,
-            'blogUrl' => get_option('show_on_front') === 'posts' ? get_home_url() : home_url('/?post_type=post'),
+            'blogUrl' => get_option('page_for_posts') ? get_permalink(get_option('page_for_posts')) : get_home_url(),
         );
     }
 

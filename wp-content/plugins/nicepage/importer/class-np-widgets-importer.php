@@ -583,7 +583,7 @@ class NpWidgetsImporter {
             }
         }
         if (strpos($content, '[blog_') !== false) {
-            $blogUrl = get_option('show_on_front') === 'posts' ? get_home_url() : home_url('/?post_type=post');
+            $blogUrl = get_option('page_for_posts') ? get_permalink(get_option('page_for_posts')) : get_home_url();
             $content = preg_replace('/\[blog_[0-9]*?\]/', $blogUrl, $content);
         }
         $content = self::replaceProductsLinks($content);

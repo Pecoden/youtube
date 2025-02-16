@@ -2717,42 +2717,6 @@ a {
   width: 100%;
   pointer-events: none;
 } .nicepage-container 
-.u-form-text.u-text {
-  margin-top: 0;
-  margin-bottom: 0;
-} .nicepage-container 
-.u-input-row {
-  display: flex;
-  align-items: center;
-} .nicepage-container 
-.u-input-row:first-child {
-  margin-top: 0 !important;
-} .nicepage-container 
-.u-input-row input {
-  margin: 0;
-  flex-shrink: 0;
-} .nicepage-container 
-.u-input-row .u-field-label, .nicepage-container 
-.u-input-row .u-label {
-  display: inline-block;
-  margin-left: 5px;
-  margin-bottom: 0;
-} .nicepage-container 
-.u-form-radiobutton.u-form-input-layout-horizontal .u-form-radio-button-wrapper, .nicepage-container 
-.u-form-radiobutton.u-form-input-layout-horizontal .u-form-checkbox-group-wrapper, .nicepage-container 
-.u-form-checkbox-group.u-form-input-layout-horizontal .u-form-radio-button-wrapper, .nicepage-container 
-.u-form-checkbox-group.u-form-input-layout-horizontal .u-form-checkbox-group-wrapper {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-} .nicepage-container 
-.u-form-radiobutton.u-form-input-layout-horizontal .u-form-radio-button-wrapper .u-input-row, .nicepage-container 
-.u-form-radiobutton.u-form-input-layout-horizontal .u-form-checkbox-group-wrapper .u-input-row, .nicepage-container 
-.u-form-checkbox-group.u-form-input-layout-horizontal .u-form-radio-button-wrapper .u-input-row, .nicepage-container 
-.u-form-checkbox-group.u-form-input-layout-horizontal .u-form-checkbox-group-wrapper .u-input-row {
-  margin-top: 0;
-  margin-right: 1em;
-} .nicepage-container 
 .u-form-file-upload input[type="file"] {
   display: none !important;
 } .nicepage-container 
@@ -2830,6 +2794,42 @@ a {
   flex-basis: 100%;
   margin-top: 0.5em;
   margin-bottom: 0;
+} .nicepage-container 
+.u-form-text.u-text {
+  margin-top: 0;
+  margin-bottom: 0;
+} .nicepage-container 
+.u-input-row {
+  display: flex;
+  align-items: center;
+} .nicepage-container 
+.u-input-row:first-child {
+  margin-top: 0 !important;
+} .nicepage-container 
+.u-input-row input {
+  margin: 0;
+  flex-shrink: 0;
+} .nicepage-container 
+.u-input-row .u-field-label, .nicepage-container 
+.u-input-row .u-label {
+  display: inline-block;
+  margin-left: 5px;
+  margin-bottom: 0;
+} .nicepage-container 
+.u-form-radiobutton.u-form-input-layout-horizontal .u-form-radio-button-wrapper, .nicepage-container 
+.u-form-radiobutton.u-form-input-layout-horizontal .u-form-checkbox-group-wrapper, .nicepage-container 
+.u-form-checkbox-group.u-form-input-layout-horizontal .u-form-radio-button-wrapper, .nicepage-container 
+.u-form-checkbox-group.u-form-input-layout-horizontal .u-form-checkbox-group-wrapper {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+} .nicepage-container 
+.u-form-radiobutton.u-form-input-layout-horizontal .u-form-radio-button-wrapper .u-input-row, .nicepage-container 
+.u-form-radiobutton.u-form-input-layout-horizontal .u-form-checkbox-group-wrapper .u-input-row, .nicepage-container 
+.u-form-checkbox-group.u-form-input-layout-horizontal .u-form-radio-button-wrapper .u-input-row, .nicepage-container 
+.u-form-checkbox-group.u-form-input-layout-horizontal .u-form-checkbox-group-wrapper .u-input-row {
+  margin-top: 0;
+  margin-right: 1em;
 } .nicepage-container 
 .u-form-rating .u-input-hidden {
   height: 100%;
@@ -11513,11 +11513,8 @@ div.u-video, .nicepage-container
   margin: 0;
   height: 100%;
 } .nicepage-container 
-.u-nav-popup.u-nav-item {
+.u-nav-popup .u-nav-item {
   height: auto;
-} .nicepage-container 
-.u-nav-popup.fake:not(.open) {
-  display: none;
 } .nicepage-container 
 .u-nav-popup .u-nav:not([class*="u-align-"]) .u-nav {
   text-align: inherit;
@@ -11621,11 +11618,9 @@ div.u-video, .nicepage-container
   pointer-events: auto;
 } .nicepage-container 
 .u-dropdown-icon .u-nav-link:first-child:nth-last-child(2):after {
-  content: "\2304";
+  content: "\25BE";
   margin-left: 0.5rem;
   margin-right: -0.5rem;
-  display: inline-block;
-  transform: translateY(-20%);
 } .nicepage-container 
 .u-dropdown-icon .u-nav-container .u-nav-popup .u-nav-link:first-child:nth-last-child(2):after {
   content: "";
@@ -13832,12 +13827,6 @@ div.u-video, .nicepage-container
   overflow: hidden;
   width: 0;
 } .nicepage-container 
-.u-enable-responsive.prevent-animation {
-  transform: none !important;
-  opacity: 1 !important;
-  will-change: auto !important;
-  filter: none !important;
-} .nicepage-container 
 .u-enable-responsive .menu-collapse {
   display: block;
 } .nicepage-container 
@@ -14937,6 +14926,7 @@ blockquote .small:before {
 .u-sorting {
   position: relative;
   min-width: 255px;
+  margin-right: auto;
 } .nicepage-container 
 .u-sorting-left .u-sorting {
   margin-left: 0 !important;
@@ -17571,20 +17561,14 @@ a.pswp__share--download:hover {
   display: flex;
   position: relative;
 } .nicepage-container 
-.u-list-control:first-child:not(:empty) {
-  margin-bottom: 10px;
-} .nicepage-container 
-.u-repeater + .u-list-control:not(:empty) {
-  margin-top: 10px;
-} .nicepage-container 
 .u-list-control.has-categories-listbox.has-sorting, .nicepage-container 
 .u-list-control.has-pagination.has-categories-listbox, .nicepage-container 
 .u-list-control.has-pagination.has-sorting {
   display: grid;
-  grid-auto-flow: row dense;
+  grid-auto-flow: column;
   position: relative;
   align-items: center;
-  grid-template-columns: repeat(3, auto);
+  grid-template-columns: calc(33.3333%) calc(33.3333%) calc(33.3333%);
 } .nicepage-container 
 .u-pagination-center.u-sorting-center .u-list-control.has-pagination.has-sorting {
   grid-template-columns: 0;
@@ -20069,7 +20053,6 @@ span.product-remove:after {
   --num-text-hover-color: unset;
   --num-border-hover-color: unset;
   --hours-spacing-vertical: unset;
-  --hours-top-spacing: unset;
   display: flex;
   flex-wrap: nowrap;
   min-width: 280px;
@@ -20219,8 +20202,6 @@ span.product-remove:after {
   margin: unset;
   overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: #ccc #fff;
 } .nicepage-container 
 .u-calendar .u-calendar-time-container ul.u-calendar-time-list.disabled {
   pointer-events: none;
@@ -20233,7 +20214,6 @@ span.product-remove:after {
   margin-top: var(--hours-spacing-vertical);
 } .nicepage-container 
 .u-calendar .u-calendar-time-container .u-calendar-timezone {
-  margin-top: var(--hours-top-spacing);
   margin-bottom: 5px;
   font-size: 0.75rem;
 } .nicepage-container 
@@ -20365,7 +20345,7 @@ span.product-remove:after {
   border: none;
   margin: 0 !important;
   position: absolute;
-  top: auto;
+  top: 0;
   bottom: 0;
   display: flex;
   align-items: center;

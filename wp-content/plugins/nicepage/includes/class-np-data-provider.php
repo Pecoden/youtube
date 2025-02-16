@@ -412,8 +412,7 @@ class NpDataProvider {
                     $data['products'][$index]['categories'] = array();
                 }
                 $data['products'][$index]['categoriesData'] = NpDataProvider::getCategoriesData($data['products'][$index]['categories'], $allCategories);
-                $prefix = Nicepage::$override_with_plugin && (isset($_GET['products-list']) || isset($_GET['product-id'])) ? 'product-id' : 'productId';
-                $data['products'][$index]['link'] = home_url('?'. $prefix . '=' . $product['id']);
+                $data['products'][$index]['link'] = home_url('?productId=' . $product['id']);
             }
         }
         return $data;
@@ -1124,7 +1123,7 @@ class NpDataProvider {
         global $post;
         $postId = isset($post->ID) ? $post->ID : get_the_id();
         $data_provider = np_data_provider($postId);
-        $template_type = isset($post->post_type) ? ($post->post_type === 'np_shop_template' || $post->post_type === 'template') : false;
+        $template_type = isset($post->post_type) ? $post->post_type === 'np_shop_template' : false;
         $option1 = $template_type ? 'template_site_style_css_parts' : 'site_style_css_parts';
         $option2 = $template_type ? 'template_site_style_css' : 'site_style_css';
         $css_parts = NpMeta::get($option1);
@@ -1416,8 +1415,7 @@ VARS;
      * @return array $categoriesData
      */
     public static function getCategoriesData($productCategories, $allCategories) {
-        $prefix = Nicepage::$override_with_plugin && (isset($_GET['products-list']) || isset($_GET['product-id'])) ? 'products-list' : 'productsList';
-        $categoryLinkFormat = isset($_GET['np_from']) && $_GET['np_from'] == 'theme' ? '?products-list#/1///' : '?' . $prefix . '#/1///';
+        $categoryLinkFormat = isset($_GET['np_from']) && $_GET['np_from'] == 'theme' ? '?products-list#/1///' : '?productsList#/1///';
         $categoriesData = array();
         if ($productCategories) {
             foreach ($productCategories as $id) {
